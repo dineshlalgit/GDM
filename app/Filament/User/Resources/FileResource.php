@@ -1,0 +1,152 @@
+<?php
+
+namespace App\Filament\User\Resources;
+
+use App\Filament\User\Resources\FileResource\Pages;
+use App\Filament\User\Resources\FileResource\RelationManagers;
+use App\Models\MediaFile;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\FileUpload;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+
+class FileResource extends Resource
+{
+    protected static ?string $model = MediaFile::class;
+
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    public static function form(Form $form): Form
+    {
+        return $form
+        ->schema([
+            FileUpload::make('file_path')
+                ->label('Media File')
+                ->required()
+                ->disk('public')
+                ->directory('media')
+                ->preserveFilenames()
+                ->getUploadedFileNameForStorageUsing(fn ($file) => $file->getClientOriginalName())
+                ->maxSize(502400)
+                ->afterStateUpdated(function ($state, $component) {
+                    if ($state) {
+                        Log::info('File upload attempt', [
+                            'user_id' => Auth::id(),
+                            'file_name' => $state->getClientOriginalName() ?? null,
+                            'size_bytes' => $state->getSize() ?? null,
+                        ]);
+                    } else {
+                        Log::warning('File upload state is null', [
+                            'user_id' => Auth::id(),
+                        ]);
+                    }
+                })
+                ->rules([
+                    new \App\Rules\FileWithinQuota,
+                ])                ,
+
+            Forms\Components\DateTimePicker::make('uploaded_at')
+                ->label('Uploaded At')
+                ->default(now())
+                ->disabled(fn (string $context) => $context === 'create'),
+
+            Forms\Components\Hidden::make('user_id')
+                ->default(fn () => auth()->id())
+                ->required(),
+        ]);
+
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\ImageColumn::make('file_path')
+                    ->label('File')
+                    ->disk('public')
+                    ->height(120)
+                    ->width(120)
+                    ->circular()
+                    ->getStateUsing(function ($record) {
+                        $imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                        if (in_array(strtolower($record->file_type), $imageTypes)) {
+                            return $record->file_path;
+                        }
+                        return 'media/icons/' . match (strtolower($record->file_type)) {
+                            'mp4', 'mov', 'avi'         => 'video.png',
+                            'mp3', 'wav', 'ogg' , 'mpeg'=> 'audio.webp',
+                            'pdf'                       => 'pdf.png',
+                            'doc', 'docx'               => 'msdoc.png',
+                            'xls', 'xlsx'               => 'excel.png',
+                            'ppt', 'pptx'               => 'ppt.png',
+                            'zip', 'rar', '7z', 'tar', 'gz' => 'archive.png',
+                            default                     => 'file.png',
+                        };
+                    })
+                    ->url(fn ($record) => Storage::disk('public')->url($record->file_path)),
+                Tables\Columns\TextColumn::make('file_name')
+                    ->label('File Name')
+                    ->getStateUsing(function ($record) {
+                        $filePath = $record->file_path;
+                        $fileName = basename($filePath);
+                        if (str_starts_with($fileName, 'media/')) {
+                            $fileName = substr($fileName, strlen('media/'));
+                        }
+                        $dotPos = strrpos($fileName, '.');
+                        if ($dotPos !== false) {
+                            $fileName = substr($fileName, 0, $dotPos);
+                        }
+                        return $fileName;
+                    })
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('file_type')->label('File Type')->sortable(),
+                Tables\Columns\TextColumn::make('uploaded_at')->label('Uploaded At')->dateTime()->sortable(),
+            ])
+            ->filters([
+                //
+            ])
+            ->actions([
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\Action::make('download')
+                    ->label('Download')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->action(function ($record) {
+                        $filePath = $record->file_path;
+                        $fileName = basename($filePath);
+                        return response()->download(
+                            Storage::disk('public')->path($filePath),
+                            $fileName
+                        );
+                    })
+                    ->color('primary'),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\MediaGallery::route('/'),
+            'create' => Pages\CreateFile::route('/create'),
+            'edit' => Pages\EditFile::route('/{record}/edit'),
+        ];
+    }
+}
