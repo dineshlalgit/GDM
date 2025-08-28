@@ -30,7 +30,7 @@ class OwnerPanelProvider extends PanelProvider
             ->id('owner')
             ->path('owner')
             ->login()
-            ->brandName('God Dom Park')
+            ->brandName('Owner')
             ->colors([
                 'primary' => Color::Purple,
             ])
