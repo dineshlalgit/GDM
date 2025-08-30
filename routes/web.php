@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 
 Route::redirect('/', '/owner');
 
@@ -19,3 +21,12 @@ Route::post('/user/file-resources/{id}/delete', function ($id) {
     $file->delete();
     return redirect()->back()->with('success', 'File deleted!');
 })->name('custom.file.delete');
+
+Route::get('/run-migrate', function () {
+
+    Artisan::call('migrate', [
+        '--force' => true, // Required for production environments
+    ]);
+
+    return "Migration complete.";
+});

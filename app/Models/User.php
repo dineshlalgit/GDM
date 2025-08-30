@@ -65,6 +65,24 @@ class User extends Authenticatable
         return $this->hasMany(\App\Models\MediaFile::class);
     }
 
+    /**
+     * Get the event registrations for this user.
+     */
+    public function eventRegistrations()
+    {
+        return $this->hasMany(\App\Models\EventRegistration::class);
+    }
+
+    /**
+     * Get the events this user is registered for.
+     */
+    public function registeredEvents()
+    {
+        return $this->belongsToMany(\App\Models\Event::class, 'event_registrations')
+            ->withPivot('registered_at', 'status', 'notes')
+            ->withTimestamps();
+    }
+
     public function getUsedStorageAttribute()
     {
         $files = $this->mediaFiles()->pluck('file_path');

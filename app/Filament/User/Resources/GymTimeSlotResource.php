@@ -19,6 +19,8 @@ class GymTimeSlotResource extends Resource
     protected static ?string $model = GymTimeSlot::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Gym';
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
@@ -68,7 +70,7 @@ class GymTimeSlotResource extends Resource
                         if (!$userId) return 'Book';
                         $booking = $record->bookings()->where('user_id', $userId)->latest()->first();
                         if (!$booking) return 'Book';
-                        if ($booking->status === 'confirmed') return 'Cancel Booking';
+                        if ($booking->status === 'confirmed') return 'End Membership';
                         return 'Under Review';
                     })
                     ->icon(function (GymTimeSlot $record) {
