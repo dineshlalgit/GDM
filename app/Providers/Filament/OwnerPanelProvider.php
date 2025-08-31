@@ -40,6 +40,10 @@ class OwnerPanelProvider extends PanelProvider
                 PanelsRenderHook::AUTH_LOGIN_FORM_AFTER,
                 fn (): View => view('components.access-level-buttons')
             )
+            ->renderHook(
+                PanelsRenderHook::AUTH_LOGIN_FORM_BEFORE,
+                fn (): View => view('filament.custom.login-header')
+            )
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -53,6 +57,8 @@ class OwnerPanelProvider extends PanelProvider
                 \App\Filament\Widgets\OwnerLeaveStatsWidget::class,
                 \App\Filament\Widgets\OwnerStatsOverviewWidget::class,
                 \App\Filament\Widgets\OwnerFilesStatsWidget::class,
+                \App\Filament\Widgets\OwnerTokenStatsWidget::class,
+                \App\Filament\Widgets\OwnerAccountBalanceWidget::class,
 
             ])
             ->middleware([

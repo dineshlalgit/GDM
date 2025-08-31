@@ -26,22 +26,7 @@ class OwnerStatsOverviewWidget extends Widget
         ];
     }
 
-    public function getStats()
-    {
-        $total = \App\Models\User::count();
-        $active = \App\Models\User::where('active', 1)->count();
-        $suspended = \App\Models\User::where('active', 0)->count();
-        $roles = Role::withCount('users')->get()->map(fn($role) => [
-            'role' => $role->name,
-            'count' => $role->users_count,
-        ]);
-        return [
-            (object)['value' => $total, 'label' => 'Total Users'],
-            (object)['value' => $active, 'label' => 'Active'],
-            (object)['value' => $suspended, 'label' => 'Suspended'],
-            (object)['value' => $roles, 'label' => 'Role Breakdown'],
-        ];
-    }
+
 
     public function getColumnSpan(): int|string|array
     {

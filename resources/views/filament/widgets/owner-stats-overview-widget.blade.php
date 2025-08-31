@@ -1,6 +1,4 @@
-@php
-    $stats = $this->getStats();
-@endphp
+
 <x-filament::widget>
     <div class="mb-10 text-center">
         <div class="flex flex-col items-center gap-3">
@@ -165,26 +163,6 @@
                 </div>
             @endforeach
         </div>
-        <div class="role-breakdown-section">
-            <div class="text-lg font-semibold mb-2">Role Breakdown</div>
-            <ul class="role-breakdown-list">
-                @foreach($stats[3]->value as $role)
-                    @php
-                        $roleClass = strtolower($role['role']);
-                        $icon = match($roleClass) {
-                            'owner' => '👑',
-                            'admin' => '🛡️',
-                            'staff' => '👥',
-                            'user' => '👤',
-                            default => '🔰',
-                        };
-                    @endphp
-                    <li class="role-badge {{ $roleClass }}">
-                        <span class="icon">{{ $icon }}</span>
-                        {{ ucfirst($role['role']) }}: {{ $role['count'] }}
-                    </li>
-                @endforeach
-            </ul>
-        </div>
+
     </div>
 </x-filament::widget>
