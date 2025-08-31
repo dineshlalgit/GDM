@@ -64,5 +64,10 @@ class DatabaseSeeder extends Seeder
 
         // Seed sample events
         Event::factory(5)->create();
+
+        // Seed sample tokens
+        $this->call([
+            TokenSeeder::class,
+        ]);
     }
 }

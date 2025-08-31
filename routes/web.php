@@ -3,12 +3,17 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\TokenController;
 
 Route::redirect('/', '/owner');
 
 Route::fallback(function () {
     return redirect('/owner/login');
 });
+
+// Token routes
+Route::get('/tokens/{token}', [TokenController::class, 'view'])->name('tokens.view');
+Route::post('/tokens/{token}/mark-used', [TokenController::class, 'markAsUsed'])->name('tokens.mark-used');
 
 Route::get('/test-log', function () {
     Log::info('✅ Logging is working.');
