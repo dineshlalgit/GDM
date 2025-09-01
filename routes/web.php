@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\TokenController;
+use App\Http\Controllers\FeedbackController;
 
 Route::redirect('/', '/owner');
 
@@ -35,3 +36,7 @@ Route::get('/run-migrate', function () {
 
     return "Migration complete.";
 });
+
+// Feedback routes
+Route::get('/feedback', [FeedbackController::class, 'show'])->name('feedback.show');
+Route::post('/feedback', [FeedbackController::class, 'store'])->name('feedback.store');

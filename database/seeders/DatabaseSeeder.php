@@ -68,6 +68,7 @@ class DatabaseSeeder extends Seeder
         // Seed sample tokens
         $this->call([
             TokenSeeder::class,
+            FeedbackSeeder::class,
         ]);
     }
 }
