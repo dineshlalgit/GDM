@@ -22,6 +22,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Illuminate\View\View;
 use App\Http\Middleware\EnsureUserInCorrectPanel;
+use Filament\Navigation\NavigationItem;
 
 class UserPanelProvider extends PanelProvider
 {
@@ -46,6 +47,13 @@ class UserPanelProvider extends PanelProvider
                 \App\Filament\User\Widgets\StorageUsageWidget::class,
                 \App\Filament\User\Widgets\UserStatsOverviewWidget::class,
 
+            ])
+            ->navigationItems([
+                NavigationItem::make('Feedback Form')
+                    ->url('/feedback', shouldOpenInNewTab: true)
+                    ->icon('heroicon-o-chat-bubble-left-right')
+                    ->sort(100)
+                    ->label('Feedback Form')
             ])
             ->middleware([
                 EncryptCookies::class,

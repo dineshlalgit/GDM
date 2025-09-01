@@ -96,19 +96,6 @@ class FileResource extends Resource
                     'application/xml',
                     'text/xml',
                 ])
-                ->acceptedFileExtensions([
-                    // iPhone Photos
-                    'jpg', 'jpeg', 'png', 'heic', 'heif', 'webp', 'gif', 'bmp', 'tiff',
-
-                    // iPhone Videos
-                    'mp4', 'mov', 'm4v', '3gp', '3gpp', '3g2', '3gpp2', 'avi', 'wmv', 'flv', 'webm', 'ogg',
-
-                    // iPhone Audio
-                    'mp3', 'm4a', 'aac', 'wav', 'ogg', 'flac', 'aiff', 'caf',
-
-                    // iPhone Documents & Files
-                    'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'zip', 'rar', '7z', 'tar', 'gz', 'txt', 'csv', 'html', 'css', 'js', 'json', 'xml'
-                ])
                 ->helperText('Supported formats: Photos (JPG, PNG, HEIC, HEIF, WebP, GIF, BMP, TIFF), Videos (MP4, MOV, M4V, 3GP, AVI, WMV, FLV, WebM, OGG), Audio (MP3, M4A, AAC, WAV, OGG, FLAC, AIFF, CAF), Documents (PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, ZIP, RAR, 7Z, TXT, CSV, HTML, CSS, JS, JSON, XML)')
                 ->afterStateUpdated(function ($state, $component) {
                     if ($state) {
