@@ -68,7 +68,7 @@ class UserResource extends Resource
                 Forms\Components\Select::make('role_id')
                     ->label('Role')
                     ->options(function () {
-                        return Role::whereIn('name', ['user', 'staff','owner'])->pluck('name', 'id');
+                        return Role::whereIn('name', ['user', 'staff'])->pluck('name', 'id');
                     })
                     ->required(),
                 Forms\Components\Toggle::make('active')
@@ -94,7 +94,6 @@ class UserResource extends Resource
                     ->colors([
                         'info' => 'Staff',
                         'success' => 'User',
-                        'primary' => 'Owner',
                     ])
                     ->sortable(),
                 \Filament\Tables\Columns\ViewColumn::make('storage_usage')
@@ -138,7 +137,7 @@ class UserResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->whereHas('role', function ($query) {
-            $query->whereIn('name', ['user', 'staff', 'owner']);
+            $query->whereIn('name', ['user', 'staff']);
         });
     }
 
