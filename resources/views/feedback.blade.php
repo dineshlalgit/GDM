@@ -45,6 +45,32 @@
             background: linear-gradient(90deg, #667eea, #764ba2);
         }
 
+        .brand-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+
+        .brand-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .brand-divider {
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            margin: 15px auto 0;
+            border-radius: 2px;
+        }
+
         .header {
             text-align: center;
             margin-bottom: 30px;
@@ -233,6 +259,11 @@
                 margin: 10px;
             }
 
+            .brand-title {
+                font-size: 2rem;
+                letter-spacing: 1px;
+            }
+
             .header h1 {
                 font-size: 2rem;
             }
@@ -256,6 +287,11 @@
                 padding: 25px 15px;
             }
 
+            .brand-title {
+                font-size: 1.75rem;
+                letter-spacing: 0.5px;
+            }
+
             .header h1 {
                 font-size: 1.75rem;
             }
@@ -268,6 +304,11 @@
 </head>
 <body>
     <div class="feedback-container">
+        <div class="brand-header">
+            <h1 class="brand-title">GOD's DOM PARK</h1>
+            <div class="brand-divider"></div>
+        </div>
+
         <div class="header">
             <div class="icon-header">
                 <span class="material-icons">feedback</span>
