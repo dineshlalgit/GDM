@@ -32,7 +32,6 @@ class EventFactory extends Factory
             'description' => fake()->paragraph(3),
             'event_datetime' => fake()->dateTimeBetween('now', '+2 months'),
             'location' => fake()->city() . ', ' . fake()->state(),
-            'status' => fake()->randomElement(['open', 'closed']),
         ];
     }
 
@@ -43,7 +42,6 @@ class EventFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'event_datetime' => fake()->dateTimeBetween('now', '+2 months'),
-            'status' => 'open',
         ]);
     }
 
@@ -54,7 +52,6 @@ class EventFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'event_datetime' => fake()->dateTimeBetween('-6 months', 'now'),
-            'status' => 'closed',
         ]);
     }
 
@@ -63,9 +60,7 @@ class EventFactory extends Factory
      */
     public function open(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'open',
-        ]);
+        return $this;
     }
 
     /**
@@ -73,8 +68,6 @@ class EventFactory extends Factory
      */
     public function closed(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'closed',
-        ]);
+        return $this;
     }
 }

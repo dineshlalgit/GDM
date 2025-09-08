@@ -28,22 +28,12 @@ class AppServiceProvider extends ServiceProvider
         // Redirect /login to /owner/login
         Route::redirect('/login', '/owner/login');
 
-        // Schedule automatic event status updates
-        $this->scheduleEventStatusUpdates();
+        // Event status is computed now; no scheduler required.
     }
 
     public $singletons = [
         \Filament\Http\Responses\Auth\Contracts\LogoutResponse::class => \App\Http\Responses\LogoutResponse::class,
     ];
 
-    /**
-     * Schedule automatic event status updates.
-     */
-    private function scheduleEventStatusUpdates(): void
-    {
-        // Run every minute to check for events that need to be closed
-        Schedule::call(function () {
-            Event::closePastEvents();
-        })->everyMinute();
-    }
+    // Removed scheduler that used to persist event status
 }

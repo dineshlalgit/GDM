@@ -11,6 +11,10 @@ use Filament\Infolists\Components\TextEntry;
 use Illuminate\Support\Facades\Auth;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
+use Filament\Forms\Components\FileUpload;
+use Illuminate\Support\Facades\Storage;
+use App\Models\EventAttachment;
+use Illuminate\Support\Facades\File;
 
 class ViewEvent extends ViewRecord
 {
@@ -20,42 +24,89 @@ class ViewEvent extends ViewRecord
     {
         $record = $this->getRecord();
 
-        // Only show register button if event is open and user is not registered
+        $actions = [];
+
         if ($record->status === 'open' && !$record->isUserRegistered(Auth::id())) {
-            return [
-                Action::make('register')
-                    ->label('Register for Event')
-                    ->icon('heroicon-o-plus-circle')
-                    ->color('success')
-                    ->action(function () use ($record) {
-                        EventRegistration::create([
-                            'user_id' => Auth::id(),
-                            'event_id' => $record->id,
-                            'registered_at' => now(),
-                            'status' => 'registered',
-                        ]);
+            $actions[] = Action::make('register')
+                ->label('Register for Event')
+                ->icon('heroicon-o-plus-circle')
+                ->color('success')
+                ->action(function () use ($record) {
+                    EventRegistration::create([
+                        'user_id' => Auth::id(),
+                        'event_id' => $record->id,
+                        'registered_at' => now(),
+                        'status' => 'registered',
+                    ]);
 
-                        Notification::make()
-                            ->title('Registration Successful')
-                            ->body('You have been successfully registered for the event!')
-                            ->success()
-                            ->send();
+                    Notification::make()
+                        ->title('Registration Successful')
+                        ->body('You have been successfully registered for the event!')
+                        ->success()
+                        ->send();
 
-                        // Redirect back to the events list
-                        return redirect()->route('filament.user.resources.events.index');
-                    })
-                    ->requiresConfirmation()
-                    ->modalHeading('Confirm Registration')
-                    ->modalDescription("Are you sure you want to register for '{$record->name}'?")
-                    ->modalSubmitActionLabel('Yes, Register'),
-            ];
+                    return redirect()->route('filament.user.resources.events.index');
+                })
+                ->requiresConfirmation()
+                ->modalHeading('Confirm Registration')
+                ->modalDescription("Are you sure you want to register for '{$record->name}'?")
+                ->modalSubmitActionLabel('Yes, Register');
         }
 
-        return [];
+        $actions[] = Action::make('uploadAttachments')
+            ->label('Upload Photos / Videos')
+            ->icon('heroicon-o-photo')
+            ->color('primary')
+            ->form([
+                FileUpload::make('files')
+                    ->label('Select files')
+                    ->multiple()
+                    ->reorderable()
+                    ->appendFiles()
+                    ->maxSize(512000)
+                    ->disk('public')
+                    ->directory('event-attachments')
+                    ->preserveFilenames()
+                    ->acceptedFileTypes([
+                        'image/jpeg','image/png','image/webp','image/gif','image/heic','image/heif',
+                        'video/mp4','video/quicktime','video/mov','video/webm','video/x-msvideo','video/x-ms-wmv',
+                        'audio/mpeg','audio/mp3','audio/mp4','audio/x-m4a','audio/aac','audio/wav','audio/ogg','audio/flac',
+                        'application/pdf',
+                    ])
+                    ->helperText('Images, Videos, Audio, and PDF up to ~500MB total'),
+            ])
+            ->action(function (array $data) use ($record) {
+                $files = $data['files'] ?? [];
+                foreach ($files as $path) {
+                    $fullPath = is_string($path) ? $path : ($path['path'] ?? null);
+                    if (!$fullPath) continue;
+                    EventAttachment::create([
+                        'event_id' => $record->id,
+                        'user_id' => Auth::id(),
+                        'file_path' => $fullPath,
+                        'mime_type' => (function () use ($fullPath) {
+                            $absolute = Storage::disk('public')->path($fullPath);
+                            return File::exists($absolute) ? File::mimeType($absolute) : null;
+                        })(),
+                        'uploaded_at' => now(),
+                    ]);
+                }
+
+                Notification::make()
+                    ->title('Files uploaded')
+                    ->body('Your attachments were uploaded successfully.')
+                    ->success()
+                    ->send();
+            })
+            ->visible(fn () => Auth::check() && $record->isUserRegistered(Auth::id()));
+
+        return $actions;
     }
 
     public function infolist(Infolist $infolist): Infolist
     {
+        $currentRecord = $this->getRecord();
+
         return $infolist
             ->schema([
                 Section::make('Event Information')
@@ -140,6 +191,21 @@ class ViewEvent extends ViewRecord
                             }),
                     ])
                     ->columns(2),
+
+                Section::make('Your Attachments')
+                    ->schema([
+                        \Filament\Infolists\Components\ViewEntry::make('attachments_gallery')
+                            ->view('filament.user.event-attachments')
+                            ->viewData([
+                                'attachments' => $currentRecord->attachments()
+                                    ->where('user_id', Auth::id())
+                                    ->latest()
+                                    ->get(),
+                            ])
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible()
+                    ->collapsed(false),
             ]);
     }
 }

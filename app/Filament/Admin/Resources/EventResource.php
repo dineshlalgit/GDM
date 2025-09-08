@@ -69,16 +69,6 @@ class EventResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->placeholder('Enter event location'),
-
-                        Forms\Components\Select::make('status')
-                            ->label('Status')
-                            ->required()
-                            ->options([
-                                'open' => 'Open',
-                                'closed' => 'Closed',
-                            ])
-                            ->default('open')
-                            ->native(),
                     ])
                     ->columns(2),
             ]);
@@ -145,13 +135,6 @@ class EventResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('status')
-                    ->label('Status')
-                    ->options([
-                        'open' => 'Open',
-                        'closed' => 'Closed',
-                    ]),
-
                 Tables\Filters\SelectFilter::make('type')
                     ->label('Event Type')
                     ->options([
@@ -173,6 +156,7 @@ class EventResource extends Resource
                     ->query(fn (Builder $query): Builder => $query->where('event_datetime', '<', now())),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -197,6 +181,7 @@ class EventResource extends Resource
             'index' => Pages\ListEvents::route('/'),
             'create' => Pages\CreateEvent::route('/create'),
             'edit' => Pages\EditEvent::route('/{record}/edit'),
+            'view' => Pages\ViewEvent::route('/{record}'),
         ];
     }
 

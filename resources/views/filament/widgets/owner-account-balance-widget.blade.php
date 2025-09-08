@@ -165,7 +165,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             @if(!$data['hasTodayEntry'])
                 <a href="{{ route('filament.owner.resources.account-balances.create') }}"
-                   class="flex items-center p-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-200 transform hover:scale-105">
+                   class="flex items-center p-4 bg-gray-50 border border-gray-200 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-all duration-200 transform hover:scale-105">
                     <span class="text-2xl mr-3">➕</span>
                     <div>
                         <div class="font-semibold">Add Today's Balance</div>
@@ -174,7 +174,7 @@
                 </a>
             @else
                 <a href="{{ route('filament.owner.resources.account-balances.edit', $data['todayBalance']->id) }}"
-                   class="flex items-center p-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 transform hover:scale-105">
+                   class="flex items-center p-4 bg-gray-50 border border-gray-200 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-all duration-200 transform hover:scale-105">
                     <span class="text-2xl mr-3">✏️</span>
                     <div>
                         <div class="font-semibold">Edit Today's Balance</div>
@@ -184,7 +184,7 @@
             @endif
 
             <a href="{{ route('filament.owner.resources.account-balances.index') }}"
-               class="flex items-center p-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 transform hover:scale-105">
+               class="flex items-center p-4 bg-gray-50 border border-gray-200 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-all duration-200 transform hover:scale-105">
                 <span class="text-2xl mr-3">📋</span>
                 <div>
                     <div class="font-semibold">View All Balances</div>

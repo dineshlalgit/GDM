@@ -145,13 +145,13 @@ class FeedbackResource extends Resource
                     ->view('components.rating-stars')
                     ->sortable(),
 
-                TextColumn::make('message')
-                    ->label('Message')
-                    ->limit(50)
-                    ->tooltip(function ($record) {
-                        return $record->message;
-                    })
-                    ->searchable(),
+                // TextColumn::make('message')
+                //     ->label('Message')
+                //     ->limit(50)
+                //     ->tooltip(function ($record) {
+                //         return $record->message;
+                //     })
+                //     ->searchable(),
 
                 BadgeColumn::make('status')
                     ->label('Status')
@@ -217,6 +217,13 @@ class FeedbackResource extends Resource
                 Tables\Actions\ViewAction::make()
                     ->label('View Details')
                     ->icon('heroicon-o-eye'),
+                Tables\Actions\DeleteAction::make()
+                    ->label('Delete')
+                    ->requiresConfirmation()
+                    ->modalHeading('Delete Feedback')
+                    ->modalDescription('Are you sure you want to delete this feedback? This action cannot be undone.')
+                    ->modalSubmitActionLabel('Yes, delete')
+                    ->color('danger'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -247,6 +254,10 @@ class FeedbackResource extends Resource
                         ->modalHeading('Mark Feedbacks as Rejected')
                         ->modalDescription('Are you sure you want to mark the selected feedbacks as rejected?')
                         ->modalSubmitActionLabel('Yes, mark as rejected'),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->label('Delete Selected')
+                        ->requiresConfirmation()
+                        ->color('danger'),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')

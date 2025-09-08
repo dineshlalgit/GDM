@@ -8,6 +8,7 @@ use Filament\Infolists\Infolist;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\Actions\Action;
+use Filament\Infolists\Components\ViewEntry;
 
 class ViewEventRegistration extends ViewRecord
 {
@@ -15,6 +16,7 @@ class ViewEventRegistration extends ViewRecord
 
     public function infolist(Infolist $infolist): Infolist
     {
+        $current = $this->getRecord();
         return $infolist
             ->schema([
                 Section::make('User Information')
@@ -119,6 +121,23 @@ class ViewEventRegistration extends ViewRecord
                             ->dateTime('M d, Y g:i A'),
                     ])
                     ->columns(2),
+
+                Section::make('Attachments by this User for this Event')
+                    ->schema([
+                        ViewEntry::make('attachments_gallery')
+                            ->view('filament.admin.event-attachments')
+                            ->viewData([
+                                'attachments' => $current->event
+                                    ? $current->event->attachments()
+                                        ->where('user_id', $current->user_id)
+                                        ->latest()
+                                        ->get()
+                                    : collect(),
+                            ])
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsed(false)
+                    ->collapsible(),
             ]);
     }
 }

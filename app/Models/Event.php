@@ -8,6 +8,7 @@ use App\Notifications\EventClosedNotification;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Storage;
 
 class Event extends Model
 {
@@ -24,7 +25,6 @@ class Event extends Model
         'description',
         'event_datetime',
         'location',
-        'status',
     ];
 
     /**
@@ -37,6 +37,14 @@ class Event extends Model
         return [
             'event_datetime' => 'datetime',
         ];
+    }
+
+    /**
+     * Computed status: 'open' if upcoming/ongoing, 'closed' if past.
+     */
+    public function getStatusAttribute(): string
+    {
+        return $this->isPast() ? 'closed' : 'open';
     }
 
     /**
@@ -56,7 +64,7 @@ class Event extends Model
      */
     public function scopeOpen($query)
     {
-        return $query->where('status', 'open');
+        return $query->where('event_datetime', '>=', now());
     }
 
     /**
@@ -64,7 +72,7 @@ class Event extends Model
      */
     public function scopeClosed($query)
     {
-        return $query->where('status', 'closed');
+        return $query->where('event_datetime', '<', now());
     }
 
     /**
@@ -104,9 +112,7 @@ class Event extends Model
      */
     public static function closePastEvents(): void
     {
-        static::where('event_datetime', '<', now())
-            ->where('status', 'open')
-            ->update(['status' => 'closed']);
+        // No-op: status is computed now.
     }
 
     /**
@@ -115,6 +121,14 @@ class Event extends Model
     public function registrations(): HasMany
     {
         return $this->hasMany(EventRegistration::class);
+    }
+
+    /**
+     * Media attachments uploaded by users for this event.
+     */
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(EventAttachment::class);
     }
 
     /**

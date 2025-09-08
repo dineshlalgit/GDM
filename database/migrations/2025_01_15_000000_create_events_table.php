@@ -18,7 +18,6 @@ return new class extends Migration
             $table->text('description');
             $table->dateTime('event_datetime');
             $table->string('location');
-            $table->enum('status', ['open', 'closed'])->default('open');
             $table->timestamps();
         });
     }
