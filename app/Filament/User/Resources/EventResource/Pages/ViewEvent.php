@@ -36,7 +36,7 @@ class ViewEvent extends ViewRecord
                         'user_id' => Auth::id(),
                         'event_id' => $record->id,
                         'registered_at' => now(),
-                        'status' => 'registered',
+                        'status' => 'pending',
                     ]);
 
                     Notification::make()
@@ -185,7 +185,7 @@ class ViewEvent extends ViewRecord
                             }),
 
                         TextEntry::make('can_register')
-                            ->label('Registration Available')
+                            ->label('Registration status')
                             ->state(function ($record) {
                                 if ($record->status === 'closed') {
                                     return 'Event Closed';
