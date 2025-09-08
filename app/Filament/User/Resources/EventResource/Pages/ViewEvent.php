@@ -101,7 +101,7 @@ class ViewEvent extends ViewRecord
             ->visible(function () use ($record) {
                 if (!Auth::check() || $record->status !== 'open') return false;
                 $reg = $record->registrations()->where('user_id', Auth::id())->latest()->first();
-                return $reg && ($reg->status === 'accepted');
+                return $reg && in_array($reg->status, ['accepted','pending']);
             });
 
         return $actions;
