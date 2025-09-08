@@ -169,7 +169,7 @@ class ViewEvent extends ViewRecord
                             ->label('Your Status')
                             ->state(function ($record) {
                                 $reg = $record->registrations()->where('user_id', Auth::id())->latest()->first();
-                                if (!$reg) return 'Not Registered';
+                                if (!$reg) return 'Register First';
                                 return ucfirst($reg->status ?? 'pending');
                             })
                             ->badge()
@@ -187,29 +187,13 @@ class ViewEvent extends ViewRecord
                         TextEntry::make('can_register')
                             ->label('Registration status')
                             ->state(function ($record) {
-                                if ($record->status === 'closed') {
-                                    return 'Event Closed';
-                                }
                                 $reg = $record->registrations()->where('user_id', Auth::id())->latest()->first();
-                                if (!$reg) return 'Open for Registration';
-                                return match ($reg->status) {
-                                    'accepted' => 'Already Registered',
-                                    'pending' => 'Under Review',
-                                    'rejected' => 'Registration Rejected',
-                                    default => 'Open for Registration',
-                                };
+                                return $reg ? 'Registered' : 'Not Registered';
                             })
                             ->badge()
                             ->color(function ($record) {
-                                if ($record->status === 'closed') return 'danger';
                                 $reg = $record->registrations()->where('user_id', Auth::id())->latest()->first();
-                                if (!$reg) return 'info';
-                                return match ($reg->status) {
-                                    'accepted' => 'success',
-                                    'pending' => 'warning',
-                                    'rejected' => 'danger',
-                                    default => 'info',
-                                };
+                                return $reg ? 'info' : 'danger';
                             }),
                     ])
                     ->columns(2),
