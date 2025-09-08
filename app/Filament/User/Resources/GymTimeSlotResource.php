@@ -69,7 +69,7 @@ class GymTimeSlotResource extends Resource
                         $userId = Auth::id();
                         if (!$userId) return 'Book';
                         $booking = $record->bookings()->where('user_id', $userId)->latest()->first();
-                        if (!$booking) return 'Book';
+                        if (!$booking || $booking->status === 'cancelled') return 'Book';
                         if ($booking->status === 'confirmed') return 'End Membership';
                         return 'Under Review';
                     })
@@ -77,7 +77,7 @@ class GymTimeSlotResource extends Resource
                         $userId = Auth::id();
                         if (!$userId) return 'heroicon-m-plus-circle';
                         $booking = $record->bookings()->where('user_id', $userId)->latest()->first();
-                        if (!$booking) return 'heroicon-m-plus-circle';
+                        if (!$booking || $booking->status === 'cancelled') return 'heroicon-m-plus-circle';
                         if ($booking->status === 'confirmed') return 'heroicon-m-x-mark';
                         return 'heroicon-m-clock';
                     })
@@ -85,7 +85,7 @@ class GymTimeSlotResource extends Resource
                         $userId = Auth::id();
                         if (!$userId) return 'success';
                         $booking = $record->bookings()->where('user_id', $userId)->latest()->first();
-                        if (!$booking) return 'success';
+                        if (!$booking || $booking->status === 'cancelled') return 'success';
                         if ($booking->status === 'confirmed') return 'danger';
                         return 'warning';
                     })
@@ -93,13 +93,16 @@ class GymTimeSlotResource extends Resource
                         $userId = Auth::id();
                         if (!$userId) return 'Book this time slot';
                         $booking = $record->bookings()->where('user_id', $userId)->latest()->first();
-                        if (!$booking) return 'Book this time slot';
+                        if (!$booking || $booking->status === 'cancelled') return 'Book this time slot';
                         if ($booking->status === 'confirmed') return 'Cancel your booking for this slot';
                         return 'Your booking is under review';
                     })
                     ->disabled(function (GymTimeSlot $record) {
                         $userId = Auth::id();
                         $booking = $userId ? $record->bookings()->where('user_id', $userId)->latest()->first() : null;
+                        if ($booking && $booking->status === 'cancelled') {
+                            $booking = null; // treat as no active booking
+                        }
                         // When pending, disable. When none, disable only if full. When confirmed, enable to allow cancel.
                         if ($booking && $booking->status === 'pending') return true;
                         if (!$booking) return $record->isFull();
@@ -117,8 +120,12 @@ class GymTimeSlotResource extends Resource
                             if ($existing->status === 'confirmed') {
                                 // Cancel only if confirmed
                                 $existing->delete();
+                                return;
                             }
-                            return; // Do nothing when pending
+                            if ($existing->status === 'pending') {
+                                return; // Do nothing when pending
+                            }
+                            // if cancelled, allow new booking to be created below
                         }
 
                         // Create booking if not full

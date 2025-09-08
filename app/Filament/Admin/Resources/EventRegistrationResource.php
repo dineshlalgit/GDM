@@ -43,6 +43,16 @@ class EventRegistrationResource extends Resource
                     ->label('Notes')
                     ->rows(3)
                     ->placeholder('Add any notes about this registration'),
+
+                Forms\Components\Select::make('status')
+                    ->label('Status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'accepted' => 'Accepted',
+                        'rejected' => 'Rejected',
+                    ])
+                    ->default('pending')
+                    ->required(),
             ]);
     }
 
@@ -89,6 +99,16 @@ class EventRegistrationResource extends Resource
                     ->label('Registration Date')
                     ->dateTime('M d, Y g:i A')
                     ->sortable(),
+
+                Tables\Columns\BadgeColumn::make('status')
+                    ->label('Status')
+                    ->colors([
+                        'warning' => 'pending',
+                        'success' => 'accepted',
+                        'danger' => 'rejected',
+                    ])
+                    ->formatStateUsing(fn (string $state): string => ucfirst($state))
+                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('event.type')
@@ -116,6 +136,17 @@ class EventRegistrationResource extends Resource
                     })),
             ])
             ->actions([
+                Tables\Actions\Action::make('accept')
+                    ->visible(fn ($record) => $record->status === 'pending')
+                    ->label('Accept')
+                    ->color('success')
+                    ->action(fn ($record) => $record->update(['status' => 'accepted'])),
+                Tables\Actions\Action::make('reject')
+                    ->visible(fn ($record) => $record->status === 'pending')
+                    ->label('Reject')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->action(fn ($record) => $record->update(['status' => 'rejected'])),
                 Tables\Actions\ViewAction::make()
                     ->label('View Details'),
             ])

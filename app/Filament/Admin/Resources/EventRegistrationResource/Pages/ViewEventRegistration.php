@@ -100,9 +100,9 @@ class ViewEventRegistration extends ViewRecord
                             ->label('Registration Status')
                             ->badge()
                             ->color(fn (string $state): string => match($state) {
-                                'registered' => 'info',
-                                'attended' => 'success',
-                                'cancelled' => 'danger',
+                                'pending' => 'warning',
+                                'accepted' => 'success',
+                                'rejected' => 'danger',
                                 default => 'gray',
                             })
                             ->formatStateUsing(fn (string $state): string => ucfirst($state)),

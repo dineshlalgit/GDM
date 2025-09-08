@@ -76,9 +76,12 @@ class GymBookingResource extends Resource
 					->color('success')
 					->action(fn (GymBooking $record) => $record->update(['status' => 'confirmed'])),
 				Tables\Actions\Action::make('cancel')
+					->label(fn (GymBooking $record) => $record->status === 'confirmed' ? 'End Membership' : 'Cancel')
 					->visible(fn (GymBooking $record) => in_array($record->status, ['pending','confirmed']))
 					->color('danger')
-					->action(fn (GymBooking $record) => $record->update(['status' => 'cancelled'])),
+					->action(function (GymBooking $record) {
+						$record->delete();
+					}),
 			])
 			->bulkActions([
 				Tables\Actions\BulkAction::make('confirmAll')
@@ -87,7 +90,7 @@ class GymBookingResource extends Resource
 					->color('success'),
 				Tables\Actions\BulkAction::make('cancelAll')
 					->label('Cancel Selected')
-					->action(fn ($records) => $records->each->update(['status' => 'cancelled']))
+					->action(fn ($records) => $records->each->delete())
 					->color('danger'),
 			]);
 	}

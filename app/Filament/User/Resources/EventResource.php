@@ -113,7 +113,7 @@ class EventResource extends Resource
                             'user_id' => Auth::id(),
                             'event_id' => $record->id,
                             'registered_at' => now(),
-                            'status' => 'registered',
+                            'status' => 'pending',
                         ]);
                     })
                     ->requiresConfirmation()

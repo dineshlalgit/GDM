@@ -14,6 +14,7 @@ class EventRegistration extends Model
         'user_id',
         'event_id',
         'registered_at',
+        'status',
         'notes',
     ];
 

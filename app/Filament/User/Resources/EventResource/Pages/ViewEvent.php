@@ -98,7 +98,11 @@ class ViewEvent extends ViewRecord
                     ->success()
                     ->send();
             })
-            ->visible(fn () => Auth::check() && $record->status === 'open' && $record->isUserRegistered(Auth::id()));
+            ->visible(function () use ($record) {
+                if (!Auth::check() || $record->status !== 'open') return false;
+                $reg = $record->registrations()->where('user_id', Auth::id())->latest()->first();
+                return $reg && ($reg->status === 'accepted');
+            });
 
         return $actions;
     }
@@ -164,13 +168,21 @@ class ViewEvent extends ViewRecord
                         TextEntry::make('registration_status')
                             ->label('Your Status')
                             ->state(function ($record) {
-                                if ($record->isUserRegistered(Auth::id())) {
-                                    return 'Registered';
-                                }
-                                return 'Not Registered';
+                                $reg = $record->registrations()->where('user_id', Auth::id())->latest()->first();
+                                if (!$reg) return 'Not Registered';
+                                return ucfirst($reg->status ?? 'pending');
                             })
                             ->badge()
-                            ->color(fn ($record) => $record->isUserRegistered(Auth::id()) ? 'success' : 'gray'),
+                            ->color(function ($record) {
+                                $reg = $record->registrations()->where('user_id', Auth::id())->latest()->first();
+                                if (!$reg) return 'gray';
+                                return match ($reg->status) {
+                                    'accepted' => 'success',
+                                    'pending' => 'warning',
+                                    'rejected' => 'danger',
+                                    default => 'gray',
+                                };
+                            }),
 
                         TextEntry::make('can_register')
                             ->label('Registration Available')
@@ -178,16 +190,26 @@ class ViewEvent extends ViewRecord
                                 if ($record->status === 'closed') {
                                     return 'Event Closed';
                                 }
-                                if ($record->isUserRegistered(Auth::id())) {
-                                    return 'Already Registered';
-                                }
-                                return 'Open for Registration';
+                                $reg = $record->registrations()->where('user_id', Auth::id())->latest()->first();
+                                if (!$reg) return 'Open for Registration';
+                                return match ($reg->status) {
+                                    'accepted' => 'Already Registered',
+                                    'pending' => 'Under Review',
+                                    'rejected' => 'Registration Rejected',
+                                    default => 'Open for Registration',
+                                };
                             })
                             ->badge()
-                            ->color(fn ($record) => match(true) {
-                                $record->status === 'closed' => 'danger',
-                                $record->isUserRegistered(Auth::id()) => 'success',
-                                default => 'info',
+                            ->color(function ($record) {
+                                if ($record->status === 'closed') return 'danger';
+                                $reg = $record->registrations()->where('user_id', Auth::id())->latest()->first();
+                                if (!$reg) return 'info';
+                                return match ($reg->status) {
+                                    'accepted' => 'success',
+                                    'pending' => 'warning',
+                                    'rejected' => 'danger',
+                                    default => 'info',
+                                };
                             }),
                     ])
                     ->columns(2),
