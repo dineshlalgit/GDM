@@ -78,13 +78,6 @@ class EventResource extends Resource
 
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('status')
-                    ->label('Status')
-                    ->options([
-                        'open' => 'Open',
-                        'closed' => 'Closed',
-                    ]),
-
                 Tables\Filters\SelectFilter::make('type')
                     ->label('Event Type')
                     ->options([

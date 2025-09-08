@@ -98,7 +98,7 @@ class ViewEvent extends ViewRecord
                     ->success()
                     ->send();
             })
-            ->visible(fn () => Auth::check() && $record->isUserRegistered(Auth::id()));
+            ->visible(fn () => Auth::check() && $record->status === 'open' && $record->isUserRegistered(Auth::id()));
 
         return $actions;
     }
