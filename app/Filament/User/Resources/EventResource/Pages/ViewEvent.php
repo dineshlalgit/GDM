@@ -68,12 +68,12 @@ class ViewEvent extends ViewRecord
                     ->directory('event-attachments')
                     ->preserveFilenames()
                     ->acceptedFileTypes([
-                        'image/jpeg','image/png','image/webp','image/gif','image/heic','image/heif',
-                        'video/mp4','video/quicktime','video/mov','video/webm','video/x-msvideo','video/x-ms-wmv',
-                        'audio/mpeg','audio/mp3','audio/mp4','audio/x-m4a','audio/aac','audio/wav','audio/ogg','audio/flac',
-                        'application/pdf',
+                        // Images (align with Media gallery)
+                        'image/jpeg','image/jpg','image/png','image/heic','image/heif','image/webp','image/gif','image/bmp','image/tiff',
+                        // Videos (align with Media gallery)
+                        'video/mp4','video/mov','video/m4v','video/3gpp','video/3gpp2','video/quicktime','video/x-msvideo','video/x-ms-wmv','video/x-flv','video/webm','video/ogg',
                     ])
-                    ->helperText('Images, Videos, Audio, and PDF up to ~500MB total'),
+                    ->helperText('Images (JPG, PNG, HEIC, HEIF, WebP, GIF, BMP, TIFF) and Videos (MP4, MOV, M4V, 3GP, 3G2, AVI, WMV, FLV, WebM, OGG) up to ~500MB total'),
             ])
             ->action(function (array $data) use ($record) {
                 $files = $data['files'] ?? [];
