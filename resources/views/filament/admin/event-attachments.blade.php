@@ -88,8 +88,8 @@
                                 @if($isImage)
                                     <img src="{{ $url }}" alt="{{ $name }}" style="width:100%;max-height:78vh;object-fit:contain;border-radius:10px">
                                 @elseif($isVideo)
-                                    <video controls style="width:100%;max-height:78vh;border-radius:10px">
-                                        <source src="{{ $url }}" type="{{ $mime }}"/>
+                                    <video controls playsinline preload="metadata" style="width:100%;max-height:78vh;border-radius:10px">
+                                        <source src="{{ $url }}" />
                                     </video>
                                 @elseif($isAudio)
                                     <audio controls style="width:100%">
