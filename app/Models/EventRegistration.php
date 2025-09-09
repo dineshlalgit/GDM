@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Log;
 
 class EventRegistration extends Model
 {
@@ -38,4 +39,24 @@ class EventRegistration extends Model
         return $this->belongsTo(Event::class);
     }
 
+    protected static function booted(): void
+    {
+        static::deleting(function (EventRegistration $registration): void {
+            // Delete attachments uploaded by this user for this specific event
+            $deleted = EventAttachment::where('event_id', $registration->event_id)
+                ->where('user_id', $registration->user_id)
+                ->get();
+
+            $count = $deleted->count();
+            $deleted->each->delete();
+
+            if ($count > 0) {
+                Log::info('[EventRegistration] Deleted user event attachments due to registration deletion.', [
+                    'event_id' => $registration->event_id,
+                    'user_id' => $registration->user_id,
+                    'attachments_deleted' => $count,
+                ]);
+            }
+        });
+    }
 }
